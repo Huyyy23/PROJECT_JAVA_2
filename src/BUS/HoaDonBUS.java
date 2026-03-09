@@ -4,8 +4,6 @@ import DAO.ChiTietHoaDonDAO;
 import DAO.HoaDonDAO;
 import DTO.ChiTietHoaDonDTO;
 import DTO.HoaDonDTO;
-import DTO.KhachHangDTO;
-import DTO.NhanVienDTO;
 import UTIL.DBConnection;
 
 import java.math.BigDecimal;
@@ -267,6 +265,21 @@ public class HoaDonBUS {
         kiemTraChoPhepChinhSua(trangThaiHoaDon);
         if (!HoaDonDAO.deleteChiTiet(maChiTiet))
             throw new Exception("X\u00f3a chi ti\u1ebft th\u1ea5t b\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i!");
+    }
+
+    // Xóa toàn bộ chi tiết của 1 hóa đơn (dùng khi sửa đơn chờ)
+    // Trigger trg_ChiTietHoaDon_AfterDelete tự hoàn trả kho + serial cho từng dòng
+    public void xoaChiTietHoaDon(int maHoaDon) throws Exception {
+        java.sql.Connection cn = DBConnection.getConnection();
+        try {
+            java.sql.PreparedStatement ps = cn.prepareStatement(
+                "DELETE FROM CHITIETHOADON WHERE MaHoaDon = ?");
+            ps.setInt(1, maHoaDon);
+            ps.executeUpdate();
+            ps.close();
+        } catch (Exception ex) {
+            throw new Exception("Kh\u00f4ng th\u1ec3 x\u00f3a chi ti\u1ebft h\u00f3a \u0111\u01a1n #" + maHoaDon + ": " + ex.getMessage());
+        }
     }
 
     // Hủy đơn chờ (ChoXuLy → Huy)
