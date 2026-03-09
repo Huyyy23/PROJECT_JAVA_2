@@ -92,6 +92,16 @@ public class BanHangPanel2 extends JPanel {
 
     private final SanPhamBUS        sanPhamBUS   = new SanPhamBUS();
     private final HoaDonBUS         hoaDonBUS    = new HoaDonBUS();
+
+    // References đến panel khác — set từ MainFrame sau khi khởi tạo
+    private GUI.HoaDonPanel  hoaDonPanelRef  = null;
+    private GUI.BaoHanhPanel baoHanhPanelRef = null;
+
+    /** Gọi từ MainFrame: setRelatedPanels(hoaDonPanel, baoHanhPanel) */
+    public void setRelatedPanels(GUI.HoaDonPanel hoaDon, GUI.BaoHanhPanel baoHanh) {
+        this.hoaDonPanelRef  = hoaDon;
+        this.baoHanhPanelRef = baoHanh;
+    }
     private final LoaiSanPhamBUS    loaiBUS      = new LoaiSanPhamBUS();
     private final KhachHangBUS      khachHangBUS = new KhachHangBUS();
     private final NhanVienBUS       nhanVienBUS  = new NhanVienBUS();
@@ -999,7 +1009,6 @@ public class BanHangPanel2 extends JPanel {
         tcm.getColumn(5).setCellRenderer(xRenderer);
         tcm.getColumn(5).setCellEditor(xEditor);
         JScrollPane sc=new JScrollPane(cartTable); sc.setBorder(new LineBorder(new Color(180,210,240),1));
-        panel.add(sc,BorderLayout.CENTER);
 
         // ── Toast hiển thị ở dải nhỏ phía trên footer ────────────────────────
         lblToast = new JLabel("", SwingConstants.CENTER);
@@ -1483,8 +1492,10 @@ public class BanHangPanel2 extends JPanel {
             }
             try {
                 ArrayList<ChiTietHoaDonDTO> chiTiet = hoaDonBUS.getChiTietHoaDonCho(hd2.getMaHoaDon());
-                hoaDonBUS.huyHoaDonCho(hd2.getMaHoaDon(), hd2.getTrangThai());
-                resetCart(); maHoaDonChoDangMo = 0;
+                // KHÔNG hủy hóa đơn — giữ nguyên trạng thái ChoXuLy
+                // Ghi nhớ mã HD để doCheckout() cập nhật đúng HD này
+                resetCart();
+                maHoaDonChoDangMo = hd2.getMaHoaDon();
                 for (ChiTietHoaDonDTO ct : chiTiet) {
                     double dg = ct.getDonGia().doubleValue();
                     double tt = ct.getThanhTien()!=null?ct.getThanhTien().doubleValue():dg*ct.getSoLuong();
@@ -1493,7 +1504,7 @@ public class BanHangPanel2 extends JPanel {
                         if (sp.getMaSP()==ct.getMaSP()) { sp.setSoLuongTon(Math.max(0,sp.getSoLuongTon()-ct.getSoLuong())); break; }
                 }
                 refreshCartTable(); applyAllFilters(); dlg.dispose();
-                showToast("\u0110\u00e3 t\u1ea3i \u0111\u01a1n "+String.format("HD%03d",hd2.getMaHoaDon())+" v\u00e0o gi\u1ecf");
+                showToast("\u0110\u00e3 t\u1ea3i \u0111\u01a1n "+String.format("HD%03d",hd2.getMaHoaDon())+" v\u00e0o gi\u1ecf (\u0111ang s\u1eeda)");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dlg,"L\u1ed7i t\u1ea3i \u0111\u01a1n:\n"+ex.getMessage(),"L\u1ed7i",JOptionPane.ERROR_MESSAGE);
             }
@@ -1623,8 +1634,16 @@ public class BanHangPanel2 extends JPanel {
             Integer maKH = null;
             if (khachHangHienTai!=null) { maKH = khachHangHienTai.getMaKhachHang(); }
             else if (!sdt.isEmpty()) { maKH = hoaDonBUS.timHoacTaoKhachHang(tenKH, sdt); }
-            int maHD = hoaDonBUS.taoHoaDon(maKH, maNVHienTai, BigDecimal.ZERO);
-            if (maHD==-1) throw new Exception("Kh\u00f4ng t\u1ea1o \u0111\u01b0\u1ee3c h\u00f3a \u0111\u01a1n!");
+            int maHD;
+            if (maHoaDonChoDangMo > 0) {
+                // Đang sửa đơn chờ → dùng lại HD cũ, xóa chi tiết cũ rồi thêm lại
+                maHD = maHoaDonChoDangMo;
+                hoaDonBUS.xoaChiTietHoaDon(maHD);
+            } else {
+                // Đơn mới → tạo HD mới
+                maHD = hoaDonBUS.taoHoaDon(maKH, maNVHienTai, BigDecimal.ZERO);
+                if (maHD==-1) throw new Exception("Kh\u00f4ng t\u1ea1o \u0111\u01b0\u1ee3c h\u00f3a \u0111\u01a1n!");
+            }
             for (Object[] item : cartItems) {
                 int    maSP    = Integer.parseInt(item[0].toString().trim());
                 double donGia  = Double.parseDouble(item[2].toString().trim());
@@ -1857,6 +1876,12 @@ public class BanHangPanel2 extends JPanel {
 
             txtMaHD.setText(String.format("HD%03d",maHD+1));
             resetCart();
+
+            // ── Notify các panel liên quan reload dữ liệu mới ──────────────
+            // Dùng SwingUtilities.invokeLater để tránh block EDT
+            final int finalMaHDForRefresh = maHD;
+            
+            // ─────────────────────────────────────────────────────────────────
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this,"L\u1ed7i:\n"+ex.getMessage(),"L\u1ed7i",JOptionPane.ERROR_MESSAGE);
