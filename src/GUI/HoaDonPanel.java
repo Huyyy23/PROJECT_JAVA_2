@@ -5,6 +5,7 @@ import UTIL.DBConnection;
 import UTIL.HoaDonExcelUtils;
 import UTIL.HoaDonPDFUtils;
 import DTO.HoaDonDTO;
+import DTO.SharedData;
 import DTO.ChiTietHoaDonDTO;
 
 import java.awt.*;
@@ -403,9 +404,20 @@ public class HoaDonPanel extends JPanel {
         return hoaDonList.get(row);
     }
 
+    // Kiểm tra quyền quản lý — dùng ở nhiều chỗ
+    private boolean isQuanLy() {
+        return "QuanLy".equals(SharedData.currentRole);
+    }
+
     private void actionView() { HoaDonDTO hd = getSelected(); if (hd != null) showXemDialog(hd); }
 
     private void actionDelete() {
+        if (!isQuanLy()) {
+            JOptionPane.showMessageDialog(this,
+                "B\u1ea1n kh\u00f4ng c\u00f3 quy\u1ec1n th\u1ef1c hi\u1ec7n ch\u1ee9c n\u0103ng n\u00e0y!\nCh\u1ec9 Qu\u1ea3n l\u00fd m\u1edbi \u0111\u01b0\u1ee3c ph\u00e9p h\u1ee7y h\u00f3a \u0111\u01a1n.",
+                "Kh\u00f4ng c\u00f3 quy\u1ec1n", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         HoaDonDTO hd = getSelected(); if (hd == null) return;
         String tenKH = hd.getMaKhachHang() != null ? layTenKhachHang(hd.getMaKhachHang()) : "Kh\u00e1ch l\u1ebb";
         int ok = JOptionPane.showConfirmDialog(this,
@@ -450,6 +462,8 @@ public class HoaDonPanel extends JPanel {
         String ghiChu     = hd.getGhiChu() != null && !hd.getGhiChu().isEmpty() ? hd.getGhiChu() : "\u2014";
 
         // Label động cho "Sửa hóa đơn"
+        boolean quanLy = isQuanLy();
+
         JLabel lblSuaValue = new JLabel("KH\u00d4NG");
         lblSuaValue.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblSuaValue.setForeground(new Color(150, 80, 0));
@@ -461,18 +475,22 @@ public class HoaDonPanel extends JPanel {
         addRowLabel(form, gc, 4, "T\u1ed5ng thanh to\u00e1n:", tongTT,               "Tr\u1ea1ng th\u00e1i:",       trangThai);
         addRowLabel(form, gc, 5, "Ghi ch\u00fa:",        ghiChu,                 null, null);
 
-        // Dòng 6: Sửa hóa đơn
-        gc.gridy = 6;
-        gc.gridx = 0; gc.weightx = 0.12;
-        JLabel lbSua = new JLabel("S\u1eeda h\u00f3a \u0111\u01a1n:");
-        lbSua.setFont(FONT_LABEL); lbSua.setForeground(new Color(100, 130, 170));
-        form.add(lbSua, gc);
-        gc.gridx = 1; gc.weightx = 0.88; gc.gridwidth = 3;
-        form.add(lblSuaValue, gc);
-        gc.gridwidth = 1;
+        // Dòng 6: Sửa hóa đơn — chỉ hiển thị với Quản lý
+        if (quanLy) {
+            gc.gridy = 6;
+            gc.gridx = 0; gc.weightx = 0.12;
+            JLabel lbSua = new JLabel("S\u1eeda h\u00f3a \u0111\u01a1n:");
+            lbSua.setFont(FONT_LABEL); lbSua.setForeground(new Color(100, 130, 170));
+            form.add(lbSua, gc);
+            gc.gridx = 1; gc.weightx = 0.88; gc.gridwidth = 3;
+            form.add(lblSuaValue, gc);
+            gc.gridwidth = 1;
+        }
 
         // Bảng chi tiết
-        JLabel lblCTTitle = new JLabel("  Chi ti\u1ebft s\u1ea3n ph\u1ea9m  (\u2192 ch\u1ecdn d\u00f2ng \u0111\u1ec3 s\u1eeda M\u00e3 SP / S\u1ed1 l\u01b0\u1ee3ng)");
+        JLabel lblCTTitle = new JLabel(quanLy
+            ? "  Chi ti\u1ebft s\u1ea3n ph\u1ea9m  (\u2192 ch\u1ecdn d\u00f2ng \u0111\u1ec3 s\u1eeda M\u00e3 SP / S\u1ed1 l\u01b0\u1ee3ng)"
+            : "  Chi ti\u1ebft s\u1ea3n ph\u1ea9m");
         lblCTTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblCTTitle.setForeground(PRIMARY);
         lblCTTitle.setBorder(BorderFactory.createEmptyBorder(4, 30, 4, 30));
@@ -548,10 +566,10 @@ public class HoaDonPanel extends JPanel {
         footer.add(btnExportPdf);
         footer.add(btnClose);
 
-        // Chọn dòng → hiện nút Sửa
+        // Chọn dòng → hiện nút Sửa (chỉ với Quản lý)
         ctTable.getSelectionModel().addListSelectionListener(e2 -> {
             if (!e2.getValueIsAdjusting()) {
-                btnSuaChiTiet.setVisible(ctTable.getSelectedRow() != -1);
+                btnSuaChiTiet.setVisible(quanLy && ctTable.getSelectedRow() != -1);
                 footer.revalidate(); footer.repaint();
             }
         });
