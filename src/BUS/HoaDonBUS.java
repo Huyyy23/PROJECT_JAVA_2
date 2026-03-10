@@ -1,15 +1,9 @@
 package BUS;
 
-import DAO.BaoHanhDAO;
 import DAO.ChiTietHoaDonDAO;
 import DAO.HoaDonDAO;
-import DAO.SanPhamDAO;
-import DTO.BaoHanhDTO;
 import DTO.ChiTietHoaDonDTO;
 import DTO.HoaDonDTO;
-import DTO.KhachHangDTO;
-import DTO.NhanVienDTO;
-import DTO.SanPhamDTO;
 import UTIL.DBConnection;
 
 import java.math.BigDecimal;
@@ -25,10 +19,10 @@ public class HoaDonBUS {
     // =========================================================================
     public int taoHoaDon(Integer maKhachHang, int maNV, BigDecimal phanTramGiam) {
         HoaDonDTO dto = new HoaDonDTO(
-                maKhachHang,
-                maNV,
-                phanTramGiam != null ? phanTramGiam : BigDecimal.ZERO,
-                null   // ghiChu
+            maKhachHang,
+            maNV,
+            phanTramGiam != null ? phanTramGiam : BigDecimal.ZERO,
+            null   // ghiChu
         );
         return HoaDonDAO.insert(dto);
     }
@@ -56,7 +50,7 @@ public class HoaDonBUS {
         }
 
         ChiTietHoaDonDTO ct = new ChiTietHoaDonDTO(
-                maHoaDon, maSP, maSerial, soLuong, donGia
+            maHoaDon, maSP, maSerial, soLuong, donGia
         );
 
         boolean ok = ChiTietHoaDonDAO.insert(ct);
@@ -106,9 +100,9 @@ public class HoaDonBUS {
     // =========================================================================
     private void capNhatTongTienHangTuChiTiet(int maHoaDon) throws Exception {
         String sql =
-                "UPDATE HOADON SET TongTienHang = (" +
-                        "    SELECT ISNULL(SUM(ThanhTien), 0) FROM CHITIETHOADON WHERE MaHoaDon = ?" +
-                        ") WHERE MaHoaDon = ?";
+            "UPDATE HOADON SET TongTienHang = (" +
+            "    SELECT ISNULL(SUM(ThanhTien), 0) FROM CHITIETHOADON WHERE MaHoaDon = ?" +
+            ") WHERE MaHoaDon = ?";
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, maHoaDon);
@@ -196,7 +190,7 @@ public class HoaDonBUS {
         String pt = mapPhuongThuc(phuongThuc);
 
         String sql = "INSERT INTO THANHTOAN (MaHoaDon, SoTien, PhuongThuc, TrangThai) "
-                + "VALUES (?, ?, ?, N'ThanhCong')";
+                   + "VALUES (?, ?, ?, N'ThanhCong')";
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, maHoaDon);
@@ -273,6 +267,21 @@ public class HoaDonBUS {
             throw new Exception("X\u00f3a chi ti\u1ebft th\u1ea5t b\u1ea1i, vui l\u00f2ng th\u1eed l\u1ea1i!");
     }
 
+    // Xóa toàn bộ chi tiết của 1 hóa đơn (dùng khi sửa đơn chờ)
+    // Trigger trg_ChiTietHoaDon_AfterDelete tự hoàn trả kho + serial cho từng dòng
+    public void xoaChiTietHoaDon(int maHoaDon) throws Exception {
+        java.sql.Connection cn = DBConnection.getConnection();
+        try {
+            java.sql.PreparedStatement ps = cn.prepareStatement(
+                "DELETE FROM CHITIETHOADON WHERE MaHoaDon = ?");
+            ps.setInt(1, maHoaDon);
+            ps.executeUpdate();
+            ps.close();
+        } catch (Exception ex) {
+            throw new Exception("Kh\u00f4ng th\u1ec3 x\u00f3a chi ti\u1ebft h\u00f3a \u0111\u01a1n #" + maHoaDon + ": " + ex.getMessage());
+        }
+    }
+
     // Hủy đơn chờ (ChoXuLy → Huy)
     // Trigger trg_HoaDon_Huy tự hoàn trả serial + kho
     public void huyHoaDonCho(int maHoaDon, String trangThaiHienTai) throws Exception {
@@ -320,49 +329,10 @@ public class HoaDonBUS {
         if (ghiChu == null || ghiChu.trim().isEmpty()) {
             throw new Exception("Lý do hủy/ghi chú không được để trống!");
         }
-
+        
         boolean ok = HoaDonDAO.capNhatGhiChu(maHoaDon, ghiChu.trim());
         if (!ok) {
             throw new Exception("Không thể cập nhật ghi chú cho hóa đơn #" + maHoaDon);
-        }
-    }
-
-    // =========================================================================
-    // CẤP PHIẾU BẢO HÀNH TỰ ĐỘNG SAU KHI BÁN HÀNG
-    // Gọi ngay sau thanhToanHoaDon() thành công
-    // Tạo 1 bản ghi BAOHANH cho mỗi SP có ThoiHanBaoHanhThang > 0
-    // maNV: nhân viên lập hóa đơn (dùng làm MaNVTiepNhan)
-    // =========================================================================
-    public void capPhieuBaoHanhSauBan(int maHoaDon, int maNV) {
-        ArrayList<ChiTietHoaDonDTO> chiTiet = ChiTietHoaDonDAO.getByHoaDon(maHoaDon);
-        if (chiTiet == null || chiTiet.isEmpty()) return;
-
-        DAO.SanPhamDAO spDAO = new DAO.SanPhamDAO();
-        DAO.BaoHanhDAO bhDAO = new DAO.BaoHanhDAO();
-
-        for (ChiTietHoaDonDTO ct : chiTiet) {
-            DTO.SanPhamDTO sp = spDAO.getById(ct.getMaSP());
-            if (sp == null) continue;
-
-            int thangBH = sp.getThoiHanBaoHanhThang();
-            if (thangBH <= 0) continue; // Sản phẩm không có bảo hành
-
-            DTO.BaoHanhDTO bh = new DTO.BaoHanhDTO();
-            bh.setMaIMEI(ct.getMaSerial() > 0 ? ct.getMaSerial() : null);
-            bh.setMaSP(ct.getMaSP());
-            bh.setMaHoaDon(maHoaDon);
-            bh.setMaNVTiepNhan(maNV > 0 ? maNV : null);
-            // NgayHenTra = ngày mua + tháng bảo hành (ngày hết hạn bảo hành)
-            bh.setNgayHenTra(java.time.LocalDate.now().plusMonths(thangBH));
-            bh.setMoTaLoi("Bảo hành theo hóa đơn mua hàng - " + thangBH + " tháng");
-            bh.setHinhThucXuLy("SuaChuaTaiCho");
-            bh.setTrangThai("DangXuLy");
-
-            int maBH = bhDAO.them(bh);
-            if (maBH <= 0) {
-                System.err.println("[BaoHanh] Không tạo được phiếu bảo hành cho SP="
-                        + ct.getMaSP() + " trong HĐ=" + maHoaDon);
-            }
         }
     }
 }

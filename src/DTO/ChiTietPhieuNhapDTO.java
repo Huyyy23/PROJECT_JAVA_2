@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 /**
  * DTO cho bảng CHITIETPHIEUNHAP
  * ThanhTien là computed column (SoLuong * DonGiaNhap), chỉ đọc
+ *
+ * CHANGELOG:
+ *   (không thay đổi)
  */
 public class ChiTietPhieuNhapDTO {
 
@@ -16,9 +19,6 @@ public class ChiTietPhieuNhapDTO {
     private BigDecimal thanhTien;   // computed, chỉ đọc từ DB
     private String     ghiChu;
 
-    // ----------------------------------------------------------------
-    // Constructor
-    // ----------------------------------------------------------------
     public ChiTietPhieuNhapDTO() {}
 
     public ChiTietPhieuNhapDTO(int maPN, int maSP,
@@ -31,9 +31,6 @@ public class ChiTietPhieuNhapDTO {
         this.ghiChu     = ghiChu;
     }
 
-    // ----------------------------------------------------------------
-    // Getter / Setter
-    // ----------------------------------------------------------------
     public int getMaChiTietPN()                        { return maChiTietPN; }
     public void setMaChiTietPN(int maChiTietPN)        { this.maChiTietPN = maChiTietPN; }
 
@@ -55,9 +52,6 @@ public class ChiTietPhieuNhapDTO {
     public String getGhiChu()                { return ghiChu; }
     public void setGhiChu(String ghiChu)     { this.ghiChu = ghiChu; }
 
-    // ----------------------------------------------------------------
-    // toString
-    // ----------------------------------------------------------------
     @Override
     public String toString() {
         return "ChiTietPhieuNhapDTO{" +
