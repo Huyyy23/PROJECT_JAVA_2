@@ -8,7 +8,7 @@ public class DBConnection {
 
     private static final String URL =
         "jdbc:sqlserver://localhost:1433;"
-        + "databaseName=LAPTOPSTORE1;"
+        + "databaseName=LAPTOPSTORE2;"
         + "encrypt=true;trustServerCertificate=true";
 
     private static final String USER = "sa";   

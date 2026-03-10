@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 public class NhaCungCapDAO {
 
-    private final String TABLE_NAME = "LAPTOPSTORE.dbo.NHACUNGCAP";
+    private final String TABLE_NAME = "LAPTOPSTORE2.dbo.NHACUNGCAP";
 
     // =========================================================================
     // HELPER PRIVATE
@@ -212,7 +212,7 @@ public class NhaCungCapDAO {
         Connection con = DBConnection.getConnection();
         if (con == null) return list;
         try {
-            String sql = "SELECT MaNhaCungCap FROM LAPTOPSTORE.dbo.NHACUNGCAP_SANPHAM WHERE MaSP = ?";
+            String sql = "SELECT MaNhaCungCap FROM LAPTOPSTORE2.dbo.NHACUNGCAP_SANPHAM WHERE MaSP = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, maSP);
             ResultSet rs = pst.executeQuery();
@@ -240,7 +240,7 @@ public class NhaCungCapDAO {
         Connection con = DBConnection.getConnection();
         if (con == null) return list;
         try {
-            String sql = "SELECT MaSP FROM LAPTOPSTORE.dbo.NHACUNGCAP_SANPHAM WHERE MaNhaCungCap = ?";
+            String sql = "SELECT MaSP FROM LAPTOPSTORE2.dbo.NHACUNGCAP_SANPHAM WHERE MaNhaCungCap = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, maNCC);
             ResultSet rs = pst.executeQuery();
@@ -267,7 +267,7 @@ public class NhaCungCapDAO {
         Connection con = DBConnection.getConnection();
         if (con == null) return false;
         try {
-            String sql = "DELETE FROM LAPTOPSTORE.dbo.NHACUNGCAP_SANPHAM WHERE MaSP = ?";
+            String sql = "DELETE FROM LAPTOPSTORE2.dbo.NHACUNGCAP_SANPHAM WHERE MaSP = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, maSP);
             pst.executeUpdate();
@@ -292,7 +292,7 @@ public class NhaCungCapDAO {
         Connection con = DBConnection.getConnection();
         if (con == null) return false;
         try {
-            String sql = "INSERT INTO LAPTOPSTORE.dbo.NHACUNGCAP_SANPHAM (MaNhaCungCap, MaSP)"
+            String sql = "INSERT INTO LAPTOPSTORE2.dbo.NHACUNGCAP_SANPHAM (MaNhaCungCap, MaSP)"
                        + " VALUES (?, ?)";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, maNCC);
