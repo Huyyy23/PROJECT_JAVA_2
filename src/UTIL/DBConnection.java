@@ -8,11 +8,11 @@ public class DBConnection {
 
     private static final String URL =
         "jdbc:sqlserver://localhost:1433;"
-        + "databaseName=LAPTOPSTORE;"
+        + "databaseName=LAPTOPSTORE3;"
         + "encrypt=true;trustServerCertificate=true";
 
     private static final String USER = "sa";   
-    private static final String PASSWORD = "1";  
+    private static final String PASSWORD = "13376655";  
 
     public static Connection getConnection() {
         try {
