@@ -1,11 +1,11 @@
-package DTO;
+package DTO.ThongKe;
 
 public class ThongKeDoanhThuDTO {
 
-    private String thoiGian;     // ngày / tháng / năm
-    private long tongVon;        // tổng tiền nhập
-    private long tongDoanhThu;   // tổng tiền bán
-    private long loiNhuan;       // doanh thu - vốn
+    private final String thoiGian;     // ngày / tháng / năm
+    private final long tongVon;        // tổng tiền nhập
+    private final long tongDoanhThu;   // tổng tiền bán
+    private final long loiNhuan;       // doanh thu - vốn
 
     public ThongKeDoanhThuDTO(String thoiGian, long tongVon, long tongDoanhThu, long loiNhuan) {
         this.thoiGian = thoiGian;

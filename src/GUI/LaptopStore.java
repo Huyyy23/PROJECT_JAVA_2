@@ -68,7 +68,7 @@ public class LaptopStore extends JFrame {
         contentPanel.add(new KhachHangPanel(), "Khách hàng");
         contentPanel.add(new NhaCungCapPanel(), "Nhà cung cấp");
         contentPanel.add(new BaoHanhPanel(), "Bảo hành");
-        contentPanel.add(createPlaceholder("Đổi trả", "🔄"), "Đổi trả");
+        contentPanel.add(new DoiTraGUI(), "Đổi trả");
         contentPanel.add(new ThongKeGUI(), "Thống kê");
 
         body.add(contentPanel, BorderLayout.CENTER);

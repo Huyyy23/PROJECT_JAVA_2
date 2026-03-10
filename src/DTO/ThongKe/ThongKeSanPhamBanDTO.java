@@ -1,12 +1,12 @@
-package DTO;
+package DTO.ThongKe;
 
 public class ThongKeSanPhamBanDTO {
 
-    private int maSP;
-    private String tenSP;
-    private int tongSoLuongBan;
-    private int soHoaDon;
-    private long doanhThu;
+    private final int maSP;
+    private final String tenSP;
+    private final int tongSoLuongBan;
+    private final int soHoaDon;
+    private final long doanhThu;
 
     public ThongKeSanPhamBanDTO(int maSP, String tenSP,
                                 int tongSoLuongBan, int soHoaDon, long doanhThu) {

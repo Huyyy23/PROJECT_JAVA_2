@@ -1,10 +1,10 @@
 package BUS;
 
 import DAO.ThongKeDAO;
-import DTO.ThongKeDoanhThuDTO;
-import DTO.ThongKeHoaDonBanDTO;
-import DTO.ThongKeSanPhamBanDTO;
-import DTO.ThongKeTheLoaiBanDTO;
+import DTO.ThongKe.ThongKeDoanhThuDTO;
+import DTO.ThongKe.ThongKeHoaDonBanDTO;
+import DTO.ThongKe.ThongKeSanPhamBanDTO;
+import DTO.ThongKe.ThongKeTheLoaiBanDTO;
 import java.util.ArrayList;
 import java.util.Date;
 

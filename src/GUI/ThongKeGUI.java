@@ -1,11 +1,23 @@
 package GUI;
 
-import BUS.ThongKeBUS;
-import DTO.ThongKeDoanhThuDTO;
-import DTO.ThongKeHoaDonBanDTO;
-import DTO.ThongKeSanPhamBanDTO;
-import DTO.ThongKeTheLoaiBanDTO;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,11 +27,38 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+import BUS.ThongKeBUS;
+import DTO.ThongKe.ThongKeDoanhThuDTO;
+import DTO.ThongKe.ThongKeHoaDonBanDTO;
+import DTO.ThongKe.ThongKeSanPhamBanDTO;
+import DTO.ThongKe.ThongKeTheLoaiBanDTO;
 
 public class ThongKeGUI extends JPanel {
 
@@ -30,6 +69,9 @@ public class ThongKeGUI extends JPanel {
     private static final Color CONTENT_BG = new Color(236, 242, 250);
     private static final Color CARD_BG = Color.WHITE;
     private static final Color TABLE_HEADER = new Color(21, 101, 192);
+    private static final Color TABLE_STRIPE = new Color(248, 252, 255);
+    private static final Color SUCCESS = new Color(67, 160, 71);
+    private static final Color DANGER = new Color(198, 40, 40);
     private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
     private static final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 13);
     private static final Font FONT_NORMAL = new Font("Segoe UI", Font.PLAIN, 13);
@@ -154,10 +196,44 @@ public class ThongKeGUI extends JPanel {
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(14, 20, 14, 20));
 
+        JComponent statsIcon = new JComponent() {
+            { setPreferredSize(new Dimension(32, 32)); setOpaque(false); }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+                int baseY = getHeight() - 7;
+                g2.drawLine(3, baseY, getWidth() - 3, baseY);
+
+                g2.fillRoundRect(7, baseY - 9, 4, 9, 2, 2);
+                g2.fillRoundRect(14, baseY - 14, 4, 14, 2, 2);
+                g2.fillRoundRect(21, baseY - 18, 4, 18, 2, 2);
+
+                g2.drawLine(9, baseY - 11, 16, baseY - 16);
+                g2.drawLine(16, baseY - 16, 23, baseY - 20);
+                g2.dispose();
+            }
+        };
+
         JLabel title = new JLabel("QUẢN LÝ THỐNG KÊ");
         title.setFont(FONT_TITLE);
         title.setForeground(Color.WHITE);
-        header.add(title, BorderLayout.WEST);
+
+        JPanel left = new JPanel(new GridBagLayout());
+        left.setOpaque(false);
+        GridBagConstraints lgc = new GridBagConstraints();
+        lgc.gridx = 0;
+        lgc.insets = new Insets(0, 0, 0, 6);
+        left.add(statsIcon, lgc);
+        lgc.gridx = 1;
+        lgc.insets = new Insets(0, 0, 0, 0);
+        left.add(title, lgc);
+
+        header.add(left, BorderLayout.WEST);
 
         wrap.add(header, BorderLayout.CENTER);
         return wrap;
@@ -381,7 +457,7 @@ public class ThongKeGUI extends JPanel {
                     g2.setColor(colorLoiNhuan);
                     g2.fillRect(gx + 2 * barW, top + chartH - hLoiNhuan, barW, hLoiNhuan);
 
-                    int stride = (groups <= 12) ? 1 : Math.max(1, (int) Math.ceil(groups / 10.0));
+                    int stride = (groups <= 31) ? 1 : Math.max(1, (int) Math.ceil(groups / 10.0));
                     if (i % stride == 0 || i == groups - 1) {
                         g2.setColor(new Color(110, 110, 110));
                         String label = formatXAxisLabel(d.getThoiGian(), groups);
@@ -769,7 +845,26 @@ public class ThongKeGUI extends JPanel {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         Date endDate = cal.getTime();
 
-        ArrayList<ThongKeDoanhThuDTO> result = tkBUS.thongKeDoanhThuTuNgayDenNgay(startDate, endDate);
+        ArrayList<ThongKeDoanhThuDTO> rawResult = tkBUS.thongKeDoanhThuTuNgayDenNgay(startDate, endDate);
+
+        // Dam bao luon co du 28/29/30/31 ngay tren bieu do cua thang duoc chon.
+        Map<String, ThongKeDoanhThuDTO> byDay = new HashMap<>();
+        for (ThongKeDoanhThuDTO dto : rawResult) {
+            byDay.put(dto.getThoiGian(), dto);
+        }
+
+        ArrayList<ThongKeDoanhThuDTO> result = new ArrayList<>();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        for (int day = 1; day <= maxDay; day++) {
+            String key = String.format("%02d/%02d/%04d", day, thang, nam);
+            ThongKeDoanhThuDTO dto = byDay.get(key);
+            if (dto == null) {
+                dto = new ThongKeDoanhThuDTO(key, 0, 0, 0);
+            }
+            result.add(dto);
+        }
+
         modelTheoNgayTrongThang.setRowCount(0);
         for (ThongKeDoanhThuDTO dto : result) {
             modelTheoNgayTrongThang.addRow(new Object[]{
@@ -942,6 +1037,11 @@ public class ThongKeGUI extends JPanel {
         JSpinner spinner = new JSpinner(model);
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, DATE_FORMAT);
         spinner.setEditor(editor);
+        // Keep spinner colors stable regardless of external Look&Feel overrides.
+        editor.getTextField().setBackground(Color.WHITE);
+        editor.getTextField().setForeground(PRIMARY_DARK);
+        editor.getTextField().setCaretColor(PRIMARY_DARK);
+        editor.getTextField().setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
         spinner.setPreferredSize(new Dimension(110, 28));
         spinner.setFont(FONT_NORMAL);
         spinner.setBorder(BorderFactory.createLineBorder(new Color(185, 205, 232)));
@@ -969,7 +1069,8 @@ public class ThongKeGUI extends JPanel {
         String sel = (String) cb.getSelectedItem();
         if (sel == null) return;
         Calendar cal = Calendar.getInstance();
-        Date start = null, end = null;
+        Date start;
+        Date end;
 
         switch (sel) {
             case "Hôm nay" -> { start = cal.getTime(); end = cal.getTime(); }
@@ -1198,41 +1299,113 @@ public class ThongKeGUI extends JPanel {
     private void styleTable(JTable table) {
         table.setRowHeight(26);
         table.setFont(FONT_NORMAL);
-        table.getTableHeader().setFont(FONT_LABEL);
-        table.getTableHeader().setBackground(TABLE_HEADER);
-        table.getTableHeader().setForeground(Color.WHITE);
-        table.getTableHeader().setReorderingAllowed(false);
         table.setGridColor(new Color(215, 225, 238));
         table.setSelectionBackground(new Color(200, 220, 255));
         table.setSelectionForeground(PRIMARY_DARK);
         table.setFillsViewportHeight(true);
         table.setBackground(Color.WHITE);
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(FONT_LABEL);
+        header.setReorderingAllowed(false);
+        header.setOpaque(true);
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(
+                        tbl, value, isSelected, hasFocus, row, col);
+                lbl.setHorizontalAlignment(CENTER);
+                lbl.setBackground(TABLE_HEADER);
+                lbl.setForeground(Color.WHITE);
+                lbl.setFont(FONT_LABEL);
+                lbl.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(14, 78, 156)));
+                lbl.setOpaque(true);
+                return lbl;
+            }
+        });
+
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(
+                        tbl, value, isSelected, hasFocus, row, col);
+                lbl.setFont(FONT_NORMAL);
+                lbl.setOpaque(true);
+                if (isSelected) {
+                    lbl.setBackground(tbl.getSelectionBackground());
+                    lbl.setForeground(tbl.getSelectionForeground());
+                } else {
+                    lbl.setBackground((row % 2 == 0) ? Color.WHITE : TABLE_STRIPE);
+                    lbl.setForeground(PRIMARY_DARK);
+                }
+                return lbl;
+            }
+        });
     }
 
     private JButton makeButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setFont(FONT_LABEL);
-        btn.setForeground(Color.WHITE);
-        btn.setBackground(PRIMARY);
+        final Color bg;
+        final Color fg;
+        if (text != null && text.toLowerCase().contains("excel")) {
+            bg = SUCCESS;
+            fg = Color.WHITE;
+        } else if (text != null && text.toLowerCase().contains("pdf")) {
+            bg = DANGER;
+            fg = Color.WHITE;
+        } else {
+            bg = PRIMARY;
+            fg = Color.WHITE;
+        }
+
+        Canvas cv = new Canvas();
+        Font btnFont = new Font("Segoe UI", Font.BOLD, 13);
+        FontMetrics fm0 = cv.getFontMetrics(btnFont);
+        final int w = fm0.stringWidth(text) + 36;
+
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+                Color base = getModel().isEnabled() ? bg : new Color(180, 180, 180);
+                g2.setColor(getModel().isRollover() ? base.darker() : base);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+
+                g2.setColor(fg);
+                g2.setFont(btnFont);
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(text,
+                        (getWidth() - fm.stringWidth(text)) / 2,
+                        (getHeight() - fm.getHeight()) / 2 + fm.getAscent());
+                g2.dispose();
+            }
+
+            @Override public Dimension getPreferredSize() { return new Dimension(w, 36); }
+            @Override public Dimension getMinimumSize() { return getPreferredSize(); }
+            @Override public Dimension getMaximumSize() { return getPreferredSize(); }
+        };
+
+        btn.setText("");
         btn.setFocusPainted(false);
-        btn.setOpaque(true);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(PRIMARY_DARK),
-                BorderFactory.createEmptyBorder(6, 14, 6, 14)));
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(PRIMARY_DARK); }
-            @Override public void mouseExited(java.awt.event.MouseEvent e) { btn.setBackground(PRIMARY); }
-        });
         return btn;
     }
 
     private void styleTabbedPane(JTabbedPane tabs) {
         tabs.setFont(FONT_TAB);
-        tabs.setBackground(CARD_BG);
+        tabs.setBackground(CONTENT_BG);
         tabs.setForeground(PRIMARY_DARK);
-        tabs.setOpaque(true);
-        tabs.setBorder(BorderFactory.createLineBorder(new Color(205, 220, 240)));
+        tabs.setOpaque(false);
+        tabs.setBorder(BorderFactory.createEmptyBorder(4, 2, 2, 2));
+        tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabs.setFocusable(false);
         tabs.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
             @Override protected void installDefaults() {
                 super.installDefaults();
@@ -1241,17 +1414,82 @@ public class ThongKeGUI extends JPanel {
                 shadow = new Color(200, 215, 235);
                 darkShadow = new Color(180, 200, 225);
                 focus = ACCENT;
+                tabInsets = new Insets(7, 16, 7, 16);
+                selectedTabPadInsets = new Insets(0, 0, 0, 0);
+                tabAreaInsets = new Insets(2, 2, 2, 2);
+                contentBorderInsets = new Insets(8, 0, 0, 0);
+            }
+
+            @Override
+            public void paint(Graphics g, javax.swing.JComponent c) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int areaH = calculateTabAreaHeight(tabPane.getTabPlacement(), runCount, maxTabHeight);
+
+                // Nền khu vực tab để tạo cảm giác card hiện đại.
+                g2.setColor(new Color(232, 240, 250));
+                g2.fillRoundRect(0, 0, c.getWidth() - 1, Math.max(32, areaH + 3), 14, 14);
+                g2.setColor(new Color(205, 220, 240));
+                g2.drawRoundRect(0, 0, c.getWidth() - 1, Math.max(32, areaH + 3), 14, 14);
+                g2.dispose();
+
+                super.paint(g, c);
+            }
+
+            @Override
+            protected int calculateTabHeight(int tabPlacement, int tabIndex, int fontHeight) {
+                return super.calculateTabHeight(tabPlacement, tabIndex, fontHeight) + 6;
+            }
+
+            @Override
+            protected int calculateTabWidth(int tabPlacement, int tabIndex, FontMetrics metrics) {
+                return super.calculateTabWidth(tabPlacement, tabIndex, metrics) + 10;
             }
 
             @Override protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex,
                     int x, int y, int w, int h, boolean isSelected) {
-                g.setColor(isSelected ? new Color(225, 245, 250) : new Color(243, 248, 255));
-                g.fillRect(x, y, w, h);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int arc = 14;
+                int px = x + 2;
+                int py = y + 2;
+                int pw = w - 4;
+                int ph = h - 4;
+
+                if (isSelected) {
+                    g2.setColor(new Color(0, 0, 0, 18));
+                    g2.fillRoundRect(px, py + 1, pw, ph, arc, arc);
+                    g2.setPaint(new GradientPaint(px, py, new Color(238, 250, 255), px + pw, py, new Color(218, 240, 252)));
+                    g2.fillRoundRect(px, py, pw, ph, arc, arc);
+                    g2.setColor(new Color(158, 203, 232));
+                    g2.drawRoundRect(px, py, pw, ph, arc, arc);
+                } else {
+                    g2.setColor(new Color(243, 248, 255));
+                    g2.fillRoundRect(px, py, pw, ph, arc, arc);
+                    g2.setColor(new Color(210, 225, 242));
+                    g2.drawRoundRect(px, py, pw, ph, arc, arc);
+                }
+                g2.dispose();
+            }
+
+            @Override protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {
+                // Intentionally no border: avoid double lines caused by LAF + custom painting.
+            }
+
+            @Override protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex,
+                    int x, int y, int w, int h, boolean isSelected) {
+                // Suppress default tab border to keep a clean, flat tab row.
+            }
+
+            @Override protected void paintFocusIndicator(Graphics g, int tabPlacement,
+                    Rectangle[] rects, int tabIndex, Rectangle iconRect, Rectangle textRect, boolean isSelected) {
+                // No focus ring to prevent extra lines/artifacts on some system themes.
             }
 
             @Override protected void paintText(Graphics g, int tabPlacement, Font font,
                     FontMetrics metrics, int tabIndex, String title, Rectangle textRect, boolean isSelected) {
-                g.setFont(FONT_TAB);
+                g.setFont(isSelected ? FONT_TAB.deriveFont(Font.BOLD) : FONT_TAB.deriveFont(Font.PLAIN));
                 g.setColor(isSelected ? PRIMARY : PRIMARY_DARK);
                 g.drawString(title, textRect.x, textRect.y + metrics.getAscent());
             }
@@ -1283,8 +1521,27 @@ public class ThongKeGUI extends JPanel {
         cb.setFont(FONT_NORMAL);
         cb.setBackground(Color.WHITE);
         cb.setForeground(PRIMARY_DARK);
+        cb.setOpaque(true);
+        cb.setFocusable(false);
         cb.setBorder(BorderFactory.createLineBorder(new Color(185, 205, 232)));
         cb.setPreferredSize(new Dimension(Math.max(cb.getPreferredSize().width, 120), 30));
+        cb.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                lbl.setFont(FONT_NORMAL);
+                lbl.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+                if (isSelected) {
+                    lbl.setBackground(new Color(225, 238, 255));
+                    lbl.setForeground(PRIMARY_DARK);
+                } else {
+                    lbl.setBackground(Color.WHITE);
+                    lbl.setForeground(PRIMARY_DARK);
+                }
+                return lbl;
+            }
+        });
     }
 
     private JScrollPane createTableScrollPane(JTable table) {
@@ -1333,19 +1590,5 @@ public class ThongKeGUI extends JPanel {
 
     private String formatID(String prefix, int id) {
         return String.format("%s%05d", prefix, id);
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  MAIN (để test độc lập)
-    // ════════════════════════════════════════════════════════════════════════
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Thống kê");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setContentPane(new ThongKeGUI());
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
     }
 }

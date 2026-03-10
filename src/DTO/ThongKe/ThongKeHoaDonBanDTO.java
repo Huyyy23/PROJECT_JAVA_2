@@ -1,12 +1,12 @@
-package DTO;
+package DTO.ThongKe;
 
 public class ThongKeHoaDonBanDTO {
 
-    private String thoiGian;
-    private int soHoaDon;
-    private int tongSoSanPham;
-    private int tongLoaiSanPham;
-    private long tongDoanhThu;
+    private final String thoiGian;
+    private final int soHoaDon;
+    private final int tongSoSanPham;
+    private final int tongLoaiSanPham;
+    private final long tongDoanhThu;
 
     public ThongKeHoaDonBanDTO(String thoiGian, int soHoaDon,
                                int tongSoSanPham, int tongLoaiSanPham, long tongDoanhThu) {
