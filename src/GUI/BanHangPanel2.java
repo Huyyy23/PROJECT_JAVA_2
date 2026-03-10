@@ -60,11 +60,11 @@ public class BanHangPanel2 extends JPanel {
 
     // ── Filter data — Hãng laptop (hardcode vì không có BUS riêng) ──────────
     private static final String[][] GIA_RANGES = {
-        {"Tat ca","T\u1ea5t c\u1ea3","0","999999999"},
-        {"duoi5","D\u01b0\u1edbi 5 tri\u1ec7u","0","5000000"},
-        {"5den15","5 - 15 tri\u1ec7u","5000000","15000000"},
-        {"15den30","15 - 30 tri\u1ec7u","15000000","30000000"},
-        {"tren30","Tr\u00ean 30 tri\u1ec7u","30000000","999999999"},
+            {"Tat ca","T\u1ea5t c\u1ea3","0","999999999"},
+            {"duoi5","D\u01b0\u1edbi 5 tri\u1ec7u","0","5000000"},
+            {"5den15","5 - 15 tri\u1ec7u","5000000","15000000"},
+            {"15den30","15 - 30 tri\u1ec7u","15000000","30000000"},
+            {"tren30","Tr\u00ean 30 tri\u1ec7u","30000000","999999999"},
     };
     private static final int   MALOAI_LAPTOP  = 1;
     private static final int[] MALOAI_PHUKIEN = {2, 3, 4, 5};
@@ -237,7 +237,7 @@ public class BanHangPanel2 extends JPanel {
                 if (sp.getThuongHieu() != null && !sp.getThuongHieu().trim().isEmpty())
                     brands.add(sp.getThuongHieu().trim());
             String cur = cbLaptopBrand.getSelectedItem() != null
-                ? cbLaptopBrand.getSelectedItem().toString() : "T\u1ea5t c\u1ea3 h\u00e3ng";
+                    ? cbLaptopBrand.getSelectedItem().toString() : "T\u1ea5t c\u1ea3 h\u00e3ng";
             cbLaptopBrand.removeAllItems();
             cbLaptopBrand.addItem("T\u1ea5t c\u1ea3 h\u00e3ng");
             for (String b : brands) cbLaptopBrand.addItem(b);
@@ -404,8 +404,8 @@ public class BanHangPanel2 extends JPanel {
         // → chỉ cần > 0 là còn hàng để thêm
         if (sp.getSoLuongTon() <= 0) {
             JOptionPane.showMessageDialog(this,
-                "S\u1ea3n ph\u1ea9m \u0111\u00e3 h\u1ebft h\u00e0ng!",
-                "Th\u00f4ng b\u00e1o", JOptionPane.WARNING_MESSAGE);
+                    "S\u1ea3n ph\u1ea9m \u0111\u00e3 h\u1ebft h\u00e0ng!",
+                    "Th\u00f4ng b\u00e1o", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -608,7 +608,7 @@ public class BanHangPanel2 extends JPanel {
         cbLaptopBrand.addActionListener(e -> {
             if (isLoadingBrands) return;
             filterLaptopBrand = cbLaptopBrand.getSelectedIndex() <= 0
-                ? "Tat_ca" : cbLaptopBrand.getSelectedItem().toString();
+                    ? "Tat_ca" : cbLaptopBrand.getSelectedItem().toString();
             applyAllFilters();
         });
         laptopBrandRow.add(lblHang); laptopBrandRow.add(cbLaptopBrand);
@@ -708,7 +708,7 @@ public class BanHangPanel2 extends JPanel {
         for (SanPhamDTO sp : allProducts) {
             // Lọc hãng — áp dụng cho mọi tab (giống SanPhamPanel)
             if (!filterLaptopBrand.equals("Tat_ca") &&
-                !sp.getThuongHieu().equalsIgnoreCase(filterLaptopBrand)) continue;
+                    !sp.getThuongHieu().equalsIgnoreCase(filterLaptopBrand)) continue;
 
             // Lọc theo nhóm Loại
             if (filterGroup.equals("Laptop")) {
@@ -729,9 +729,9 @@ public class BanHangPanel2 extends JPanel {
             // Lọc search
             if (!kw.isEmpty()) {
                 boolean match = sp.getTenSP().toLowerCase().contains(kw)
-                    || sp.getThuongHieu().toLowerCase().contains(kw)
-                    || String.valueOf(sp.getMaSP()).contains(kw)
-                    || (sp.getMauSac() != null && sp.getMauSac().toLowerCase().contains(kw));
+                        || sp.getThuongHieu().toLowerCase().contains(kw)
+                        || String.valueOf(sp.getMaSP()).contains(kw)
+                        || (sp.getMauSac() != null && sp.getMauSac().toLowerCase().contains(kw));
                 if (!match) continue;
             }
             out.add(sp);
@@ -905,8 +905,8 @@ public class BanHangPanel2 extends JPanel {
             @Override public void mouseMoved(MouseEvent e) {
                 int row = cartTable.rowAtPoint(e.getPoint());
                 cartTable.setCursor(row >= 0
-                    ? new Cursor(Cursor.HAND_CURSOR)
-                    : new Cursor(Cursor.DEFAULT_CURSOR));
+                        ? new Cursor(Cursor.HAND_CURSOR)
+                        : new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
         cartTable.addMouseListener(new MouseAdapter() {
@@ -978,7 +978,7 @@ public class BanHangPanel2 extends JPanel {
             public Component getTableCellEditorComponent(
                     JTable t, Object v, boolean sel, int row, int col) {
                 xEditorCell.setBackground(sel ? new Color(187,222,251)
-                                              : (row%2==0 ? WHITE : ROW_ALT));
+                        : (row%2==0 ? WHITE : ROW_ALT));
                 SwingUtilities.invokeLater(() -> {
                     int editRow = (t.getEditingRow() >= 0) ? t.getEditingRow() : row;
                     stopCellEditing();
@@ -1083,7 +1083,7 @@ public class BanHangPanel2 extends JPanel {
         lblGiamInfo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblGiamInfo.setForeground(new Color(100, 130, 170));
         lblGiamInfo.setBorder(new CompoundBorder(new LineBorder(new Color(180,210,240),1),
-            BorderFactory.createEmptyBorder(4,8,4,8)));
+                BorderFactory.createEmptyBorder(4,8,4,8)));
         lblGiamInfo.setBackground(new Color(245,248,255)); lblGiamInfo.setOpaque(true);
         gc.gridx=1; gc.gridy=4; gc.fill=GridBagConstraints.HORIZONTAL; gc.weightx=1.0; gc.gridwidth=3;
         cust.add(lblGiamInfo,gc); gc.gridwidth=1;
@@ -1107,23 +1107,23 @@ public class BanHangPanel2 extends JPanel {
                 if (sdt.isEmpty()) {
                     warnSDT.hideWarning();
                     txtSDT.setBorder(new CompoundBorder(
-                        new LineBorder(new Color(180,210,240),1),
-                        BorderFactory.createEmptyBorder(2,6,2,6)));
+                            new LineBorder(new Color(180,210,240),1),
+                            BorderFactory.createEmptyBorder(2,6,2,6)));
                     clearKhachHang(); return;
                 }
                 // Hiện lỗi ngay nếu có ký tự không phải số
                 if (!sdt.matches("\\d+")) {
                     warnSDT.showWarning("S\u0110T kh\u00f4ng h\u1ee3p l\u1ec7 (ch\u1ec9 \u0111\u01b0\u1ee3c nh\u1eadp s\u1ed1)");
                     txtSDT.setBorder(new CompoundBorder(
-                        new LineBorder(DANGER,1),
-                        BorderFactory.createEmptyBorder(2,6,2,6)));
+                            new LineBorder(DANGER,1),
+                            BorderFactory.createEmptyBorder(2,6,2,6)));
                     clearKhachHang(); return;
                 }
                 // Đủ 10 số mới tra DB, chưa đủ thì ẩn cảnh báo
                 warnSDT.hideWarning();
                 txtSDT.setBorder(new CompoundBorder(
-                    new LineBorder(new Color(180,210,240),1),
-                    BorderFactory.createEmptyBorder(2,6,2,6)));
+                        new LineBorder(new Color(180,210,240),1),
+                        BorderFactory.createEmptyBorder(2,6,2,6)));
                 if (debounce[0] != null) debounce[0].stop();
                 debounce[0] = new javax.swing.Timer(400, e -> lookupKhachHang());
                 debounce[0].setRepeats(false); debounce[0].start();
@@ -1265,8 +1265,8 @@ public class BanHangPanel2 extends JPanel {
                             if (sl > tonGoc) {
                                 sl = tonGoc; cartModel.setValueAt(sl, i, 3);
                                 JOptionPane.showMessageDialog(this,
-                                    "Kh\u00f4ng \u0111\u1ee7 s\u1ed1 l\u01b0\u1ee3ng!\nT\u1ed3n kho ch\u1ec9 c\u00f2n " + tonGoc + " s\u1ea3n ph\u1ea9m.",
-                                    "Kh\u00f4ng \u0111\u1ee7 s\u1ed1 l\u01b0\u1ee3ng", JOptionPane.WARNING_MESSAGE);
+                                        "Kh\u00f4ng \u0111\u1ee7 s\u1ed1 l\u01b0\u1ee3ng!\nT\u1ed3n kho ch\u1ec9 c\u00f2n " + tonGoc + " s\u1ea3n ph\u1ea9m.",
+                                        "Kh\u00f4ng \u0111\u1ee7 s\u1ed1 l\u01b0\u1ee3ng", JOptionPane.WARNING_MESSAGE);
                             }
                             for (SanPhamDTO sp : allProducts)
                                 if (sp.getMaSP() == maSPInt) { sp.setSoLuongTon(tonGoc - sl); break; }
@@ -1353,16 +1353,16 @@ public class BanHangPanel2 extends JPanel {
             JOptionPane.showMessageDialog(this,"Gi\u1ecf h\u00e0ng tr\u1ed1ng, kh\u00f4ng th\u1ec3 l\u01b0u!","Th\u00f4ng b\u00e1o",JOptionPane.WARNING_MESSAGE); return;
         }
         int ok = JOptionPane.showConfirmDialog(this,
-            "L\u01b0u t\u1ea1m h\u00f3a \u0111\u01a1n n\u00e0y?\nGi\u1ecf h\u00e0ng s\u1ebd \u0111\u01b0\u1ee3c reset \u0111\u1ec3 ti\u1ebfp t\u1ee5c b\u00e1n.",
-            "X\u00e1c nh\u1eadn", JOptionPane.YES_NO_OPTION);
+                "L\u01b0u t\u1ea1m h\u00f3a \u0111\u01a1n n\u00e0y?\nGi\u1ecf h\u00e0ng s\u1ebd \u0111\u01b0\u1ee3c reset \u0111\u1ec3 ti\u1ebfp t\u1ee5c b\u00e1n.",
+                "X\u00e1c nh\u1eadn", JOptionPane.YES_NO_OPTION);
         if (ok != JOptionPane.YES_OPTION) return;
         try {
             List<ChiTietHoaDonDTO> chiTietList = new ArrayList<>();
             for (Object[] item : cartItems) {
                 ChiTietHoaDonDTO ct = new ChiTietHoaDonDTO(0,
-                    Integer.parseInt(item[0].toString()), 0,
-                    Integer.parseInt(item[3].toString()),
-                    new BigDecimal(item[2].toString()));
+                        Integer.parseInt(item[0].toString()), 0,
+                        Integer.parseInt(item[3].toString()),
+                        new BigDecimal(item[2].toString()));
                 chiTietList.add(ct);
             }
             HoaDonDTO hd = new HoaDonDTO();
@@ -1374,8 +1374,8 @@ public class BanHangPanel2 extends JPanel {
             int maHD = hoaDonBUS.luuHoaDonTam(hd, chiTietList);
             maHoaDonChoDangMo = 0; resetCart();
             JOptionPane.showMessageDialog(this,
-                "\u0110\u00e3 l\u01b0u t\u1ea1m h\u00f3a \u0111\u01a1n " + String.format("HD%03d", maHD) + "!\nGi\u1ecf h\u00e0ng s\u1eb5n s\u00e0ng cho \u0111\u01a1n m\u1edbi.",
-                "L\u01b0u th\u00e0nh c\u00f4ng", JOptionPane.INFORMATION_MESSAGE);
+                    "\u0110\u00e3 l\u01b0u t\u1ea1m h\u00f3a \u0111\u01a1n " + String.format("HD%03d", maHD) + "!\nGi\u1ecf h\u00e0ng s\u1eb5n s\u00e0ng cho \u0111\u01a1n m\u1edbi.",
+                    "L\u01b0u th\u00e0nh c\u00f4ng", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,"L\u1ed7i khi l\u01b0u t\u1ea1m:\n"+ex.getMessage(),"L\u1ed7i",JOptionPane.ERROR_MESSAGE);
         }
@@ -1420,7 +1420,7 @@ public class BanHangPanel2 extends JPanel {
                 if (kh2 != null) tenKH2 = kh2.getTenKhachHang();
             }
             String ngay2 = hd2.getNgayLap() != null
-                ? hd2.getNgayLap().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm")) : "--";
+                    ? hd2.getNgayLap().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm")) : "--";
             String tien2 = (hd2.getTongTienHang()!=null?formatMoney(hd2.getTongTienHang().doubleValue()):"0")+" \u0111";
             tblModel.addRow(new Object[]{String.format("HD%03d",hd2.getMaHoaDon()),ngay2,tenNV,tenKH2,tien2});
         }
@@ -1463,8 +1463,8 @@ public class BanHangPanel2 extends JPanel {
         JPanel pAction = new JPanel(new BorderLayout(8,6));
         pAction.setBackground(new Color(240,245,255));
         pAction.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1,0,0,0,new Color(200,215,240)),
-            BorderFactory.createEmptyBorder(10,14,10,14)));
+                BorderFactory.createMatteBorder(1,0,0,0,new Color(200,215,240)),
+                BorderFactory.createEmptyBorder(10,14,10,14)));
         pAction.setVisible(false);
         JLabel lblChon = new JLabel();
         lblChon.setFont(new Font("Segoe UI",Font.BOLD,12)); lblChon.setForeground(PRIMARY_DARK);
@@ -1623,11 +1623,11 @@ public class BanHangPanel2 extends JPanel {
         String pt = rbTienMat.isSelected() ? "TienMat" : "ChuyenKhoan";
         String ptHienThi = rbTienMat.isSelected() ? "Ti\u1ec1n m\u1eb7t" : "Chuy\u1ec3n kho\u1ea3n";
         String giamHienThi = phanTramGiamKH>0
-            ? String.format("%.0f%% - H\u1ea1ng %s",phanTramGiamKH,KhachHangBUS.hangDisplayName(khachHangHienTai!=null?khachHangHienTai.getHangKhachHang():null))
-            : "Kh\u00f4ng c\u00f3";
+                ? String.format("%.0f%% - H\u1ea1ng %s",phanTramGiamKH,KhachHangBUS.hangDisplayName(khachHangHienTai!=null?khachHangHienTai.getHangKhachHang():null))
+                : "Kh\u00f4ng c\u00f3";
         int confirm = JOptionPane.showConfirmDialog(this,
-            "X\u00e1c nh\u1eadn thanh to\u00e1n?\nKh\u00e1ch h\u00e0ng: "+tenKH+"\nGi\u1ea3m gi\u00e1: "+giamHienThi+"\nTh\u00e0nh ti\u1ec1n: "+formatMoney(thanhToan)+" \u0111\nPh\u01b0\u01a1ng th\u1ee9c: "+ptHienThi,
-            "X\u00e1c nh\u1eadn", JOptionPane.YES_NO_OPTION);
+                "X\u00e1c nh\u1eadn thanh to\u00e1n?\nKh\u00e1ch h\u00e0ng: "+tenKH+"\nGi\u1ea3m gi\u00e1: "+giamHienThi+"\nTh\u00e0nh ti\u1ec1n: "+formatMoney(thanhToan)+" \u0111\nPh\u01b0\u01a1ng th\u1ee9c: "+ptHienThi,
+                "X\u00e1c nh\u1eadn", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) return;
         try {
             String sdt = txtSDT.getText().trim();
@@ -1671,8 +1671,8 @@ public class BanHangPanel2 extends JPanel {
             String thongBaoDiem = "";
             if (diemCong > 0 && khSauMua != null) {
                 thongBaoDiem = "\n\u0110i\u1ec3m t\u00edch l\u0169y: +" + diemCong + " \u0111i\u1ec3m"
-                    + " (T\u1ed5ng: " + khSauMua.getDiemTichLuy() + " \u0111i\u1ec3m)"
-                    + "\nH\u1ea1ng hi\u1ec7n t\u1ea1i: " + KhachHangBUS.hangDisplayName(khSauMua.getHangKhachHang());
+                        + " (T\u1ed5ng: " + khSauMua.getDiemTichLuy() + " \u0111i\u1ec3m)"
+                        + "\nH\u1ea1ng hi\u1ec7n t\u1ea1i: " + KhachHangBUS.hangDisplayName(khSauMua.getHangKhachHang());
             }
 
             // ── CUSTOM DIALOG THANH TOÁN THÀNH CÔNG ──────────────────────────
@@ -1685,8 +1685,8 @@ public class BanHangPanel2 extends JPanel {
 
             Window owner = SwingUtilities.getWindowAncestor(this);
             JDialog successDlg = (owner instanceof Frame)
-                ? new JDialog((Frame) owner, "Thanh to\u00e1n th\u00e0nh c\u00f4ng", true)
-                : new JDialog((Dialog) owner, "Thanh to\u00e1n th\u00e0nh c\u00f4ng", true);
+                    ? new JDialog((Frame) owner, "Thanh to\u00e1n th\u00e0nh c\u00f4ng", true)
+                    : new JDialog((Dialog) owner, "Thanh to\u00e1n th\u00e0nh c\u00f4ng", true);
             successDlg.setSize(440, 320);
             successDlg.setLocationRelativeTo(this);
             successDlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -1741,10 +1741,10 @@ public class BanHangPanel2 extends JPanel {
             bgc.insets = new Insets(3, 4, 3, 4);
 
             String[][] infoRows = {
-                {"Kh\u00e1ch h\u00e0ng:", finalTenKH},
-                {"Gi\u1ea3m gi\u00e1:", finalGiamHienThi},
-                {"Th\u00e0nh ti\u1ec1n:", formatMoney(finalThanhToan) + " \u0111"},
-                {"Ph\u01b0\u01a1ng th\u1ee9c:", finalPtHienThi},
+                    {"Kh\u00e1ch h\u00e0ng:", finalTenKH},
+                    {"Gi\u1ea3m gi\u00e1:", finalGiamHienThi},
+                    {"Th\u00e0nh ti\u1ec1n:", formatMoney(finalThanhToan) + " \u0111"},
+                    {"Ph\u01b0\u01a1ng th\u1ee9c:", finalPtHienThi},
             };
             Color labelColor = new Color(21, 101, 192);
             for (int ri = 0; ri < infoRows.length; ri++) {
@@ -1765,11 +1765,11 @@ public class BanHangPanel2 extends JPanel {
             if (!finalThongBaoDiem.isEmpty()) {
                 bgc.gridx = 0; bgc.gridy = infoRows.length; bgc.gridwidth = 2; bgc.weightx = 1.0;
                 JLabel lblDiem = new JLabel("<html><font color='#1565C0'>" +
-                    finalThongBaoDiem.trim().replace("\n", "<br>") + "</font></html>");
+                        finalThongBaoDiem.trim().replace("\n", "<br>") + "</font></html>");
                 lblDiem.setFont(new Font("Segoe UI", Font.ITALIC, 12));
                 lblDiem.setBorder(BorderFactory.createCompoundBorder(
-                    new javax.swing.border.LineBorder(new Color(187, 222, 251), 1),
-                    BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+                        new javax.swing.border.LineBorder(new Color(187, 222, 251), 1),
+                        BorderFactory.createEmptyBorder(5, 8, 5, 8)));
                 lblDiem.setBackground(new Color(245, 250, 255));
                 lblDiem.setOpaque(true);
                 bgc.insets = new Insets(8, 4, 4, 4); bgc.fill = GridBagConstraints.HORIZONTAL;
@@ -1830,7 +1830,7 @@ public class BanHangPanel2 extends JPanel {
                     FontMetrics fm = g2.getFontMetrics();
                     String txt = "\u0110\u00f3ng";
                     g2.drawString(txt, (getWidth() - fm.stringWidth(txt)) / 2,
-                        (getHeight() - fm.getHeight()) / 2 + fm.getAscent());
+                            (getHeight() - fm.getHeight()) / 2 + fm.getAscent());
                     g2.dispose();
                 }
                 @Override public Dimension getPreferredSize() { return new Dimension(80, 38); }
@@ -1845,26 +1845,26 @@ public class BanHangPanel2 extends JPanel {
                     HoaDonDTO hdExport = hoaDonBUS.timHoaDonTheoMa(finalMaHD);
                     if (hdExport == null) {
                         JOptionPane.showMessageDialog(BanHangPanel2.this,
-                            "Kh\u00f4ng t\u00ecm th\u1ea5y h\u00f3a \u0111\u01a1n #" + finalMaHD + "!",
-                            "L\u1ed7i", JOptionPane.ERROR_MESSAGE);
+                                "Kh\u00f4ng t\u00ecm th\u1ea5y h\u00f3a \u0111\u01a1n #" + finalMaHD + "!",
+                                "L\u1ed7i", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     java.util.List<ChiTietHoaDonDTO> ctList =
-                        hoaDonBUS.getCTHoaDon(finalMaHD);
+                            hoaDonBUS.getCTHoaDon(finalMaHD);
                     HoaDonPDFUtils.exportChiTiet(BanHangPanel2.this, hdExport, ctList);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(BanHangPanel2.this,
-                        "L\u1ed7i xu\u1ea5t PDF: " + ex.getMessage(),
-                        "L\u1ed7i", JOptionPane.ERROR_MESSAGE);
+                            "L\u1ed7i xu\u1ea5t PDF: " + ex.getMessage(),
+                            "L\u1ed7i", JOptionPane.ERROR_MESSAGE);
                 }
             });
             btnDong.addActionListener(ev -> successDlg.dispose());
             // ESC đóng dialog
             successDlg.getRootPane().registerKeyboardAction(
-                ev -> successDlg.dispose(),
-                KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+                    ev -> successDlg.dispose(),
+                    KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0),
+                    JComponent.WHEN_IN_FOCUSED_WINDOW);
 
             dlgFooter.add(btnXuatPDF);
             dlgFooter.add(btnDong);
@@ -1880,7 +1880,7 @@ public class BanHangPanel2 extends JPanel {
             // ── Notify các panel liên quan reload dữ liệu mới ──────────────
             // Dùng SwingUtilities.invokeLater để tránh block EDT
             final int finalMaHDForRefresh = maHD;
-            
+
             // ─────────────────────────────────────────────────────────────────
         } catch (Exception ex) {
             ex.printStackTrace();
