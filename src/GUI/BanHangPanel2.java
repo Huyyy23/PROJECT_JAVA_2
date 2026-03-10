@@ -1654,15 +1654,6 @@ public class BanHangPanel2 extends JPanel {
             if (giam>0) hoaDonBUS.capNhatPhanTramGiam(maHD, BigDecimal.valueOf(phanTramGiamKH));
             hoaDonBUS.thanhToanHoaDon(maHD, BigDecimal.valueOf(giam), BigDecimal.valueOf(thanhToan), pt);
 
-            // ── CẤP PHIẾU BẢO HÀNH TỰ ĐỘNG ──────────────────────────────────
-            // Tạo bảo hành cho từng SP có ThoiHanBaoHanhThang > 0
-            try {
-                hoaDonBUS.capPhieuBaoHanhSauBan(maHD, maNVHienTai);
-            } catch (Exception eBH) {
-                System.err.println("[BaoHanh] Lỗi khi cấp phiếu BH cho HĐ#" + maHD + ": " + eBH.getMessage());
-            }
-            // ─────────────────────────────────────────────────────────────────
-
             // ── TÍCH ĐIỂM CHO KHÁCH HÀNG THÀNH VIÊN ──────────────────────────
             // Quy tắc: cứ 1.000.000đ (tiền hàng sau giảm, trước VAT) = 1 điểm
             int diemCong = 0;
@@ -1889,7 +1880,7 @@ public class BanHangPanel2 extends JPanel {
             // ── Notify các panel liên quan reload dữ liệu mới ──────────────
             // Dùng SwingUtilities.invokeLater để tránh block EDT
             final int finalMaHDForRefresh = maHD;
-            
+
             // ─────────────────────────────────────────────────────────────────
         } catch (Exception ex) {
             ex.printStackTrace();

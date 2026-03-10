@@ -19,10 +19,10 @@ public class HoaDonBUS {
     // =========================================================================
     public int taoHoaDon(Integer maKhachHang, int maNV, BigDecimal phanTramGiam) {
         HoaDonDTO dto = new HoaDonDTO(
-            maKhachHang,
-            maNV,
-            phanTramGiam != null ? phanTramGiam : BigDecimal.ZERO,
-            null   // ghiChu
+                maKhachHang,
+                maNV,
+                phanTramGiam != null ? phanTramGiam : BigDecimal.ZERO,
+                null   // ghiChu
         );
         return HoaDonDAO.insert(dto);
     }
@@ -50,12 +50,35 @@ public class HoaDonBUS {
         }
 
         ChiTietHoaDonDTO ct = new ChiTietHoaDonDTO(
-            maHoaDon, maSP, maSerial, soLuong, donGia
+                maHoaDon, maSP, maSerial, soLuong, donGia
         );
 
         boolean ok = ChiTietHoaDonDAO.insert(ct);
         if (!ok) {
             throw new Exception("Không thể thêm sản phẩm vào hóa đơn (MaSP=" + maSP + ")!");
+        }
+
+        // Trừ tồn kho trong SANPHAM (phòng trường hợp DB không có trigger)
+        try (Connection cn = DBConnection.getConnection();
+             PreparedStatement ps = cn.prepareStatement(
+                     "UPDATE SANPHAM SET SoLuongTon = SoLuongTon - ? WHERE MaSP = ? AND SoLuongTon >= ?")) {
+            ps.setInt(1, soLuong);
+            ps.setInt(2, maSP);
+            ps.setInt(3, soLuong);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            // Log lỗi nhưng không throw — tránh rollback toàn bộ hóa đơn
+            System.err.println("[HoaDonBUS] Cảnh báo: không trừ được kho SP " + maSP + ": " + e.getMessage());
+        }
+
+        // Đánh dấu serial đã bán
+        try (Connection cn = DBConnection.getConnection();
+             PreparedStatement ps = cn.prepareStatement(
+                     "UPDATE SERIAL SET TrangThai = N'DaBan' WHERE MaSerial = ?")) {
+            ps.setInt(1, maSerial);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("[HoaDonBUS] Cảnh báo: không cập nhật serial " + maSerial + ": " + e.getMessage());
         }
     }
 
@@ -100,9 +123,9 @@ public class HoaDonBUS {
     // =========================================================================
     private void capNhatTongTienHangTuChiTiet(int maHoaDon) throws Exception {
         String sql =
-            "UPDATE HOADON SET TongTienHang = (" +
-            "    SELECT ISNULL(SUM(ThanhTien), 0) FROM CHITIETHOADON WHERE MaHoaDon = ?" +
-            ") WHERE MaHoaDon = ?";
+                "UPDATE HOADON SET TongTienHang = (" +
+                        "    SELECT ISNULL(SUM(ThanhTien), 0) FROM CHITIETHOADON WHERE MaHoaDon = ?" +
+                        ") WHERE MaHoaDon = ?";
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, maHoaDon);
@@ -190,7 +213,7 @@ public class HoaDonBUS {
         String pt = mapPhuongThuc(phuongThuc);
 
         String sql = "INSERT INTO THANHTOAN (MaHoaDon, SoTien, PhuongThuc, TrangThai) "
-                   + "VALUES (?, ?, ?, N'ThanhCong')";
+                + "VALUES (?, ?, ?, N'ThanhCong')";
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, maHoaDon);
@@ -273,7 +296,7 @@ public class HoaDonBUS {
         java.sql.Connection cn = DBConnection.getConnection();
         try {
             java.sql.PreparedStatement ps = cn.prepareStatement(
-                "DELETE FROM CHITIETHOADON WHERE MaHoaDon = ?");
+                    "DELETE FROM CHITIETHOADON WHERE MaHoaDon = ?");
             ps.setInt(1, maHoaDon);
             ps.executeUpdate();
             ps.close();
@@ -329,7 +352,7 @@ public class HoaDonBUS {
         if (ghiChu == null || ghiChu.trim().isEmpty()) {
             throw new Exception("Lý do hủy/ghi chú không được để trống!");
         }
-        
+
         boolean ok = HoaDonDAO.capNhatGhiChu(maHoaDon, ghiChu.trim());
         if (!ok) {
             throw new Exception("Không thể cập nhật ghi chú cho hóa đơn #" + maHoaDon);
